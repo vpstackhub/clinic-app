@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clinic_db
+      MYSQL_USER: clinic_user
+      MYSQL_PASSWORD: clinic_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  clinic-app:
+    build: .
+    container_name: clinic_container
+    restart: always
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/clinic_db
+      SPRING_DATASOURCE_USERNAME: clinic_user
+      SPRING_DATASOURCE_PASSWORD: clinic_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql_data:
